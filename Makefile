@@ -1,14 +1,26 @@
+# Parameters
 ARCH ?= x86_64
 KERNEL := build/kernel-$(ARCH).bin
 IMG := build/os-$(ARCH).img
 
+# Required tools (be sure to add tools to $PATH)
+CC := $(ARCH)-linux-gcc
+LD := $(ARCH)-linux-ld
+
+# Directories
 SRC_DIR := src/arch/$(ARCH)
 
+# Source files
 LD_SCRIPT := $(SRC_DIR)/linker.ld
 GRUB_CFG := $(SRC_DIR)/grub.cfg
 ASM_SRC := $(wildcard $(SRC_DIR)/*.asm)
 ASM_OBJ := $(patsubst $(SRC_DIR)/%.asm, build/arch/$(ARCH)/%.o, $(ASM_SRC))
+C_SRC := $(wildcard $(SRC_DIR)/*.c)
+C_OBJ := $(patsubst $(SRC_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
+# Tool options
+CFLAGS := -g -c -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+LDFLAGS := -n -T $(LD_SCRIPT) -o $(KERNEL)
 QEMU_OPTS := -s -drive format=raw,file=$(IMG) -serial stdio
 
 .PHONY: all clean run img
@@ -33,10 +45,16 @@ $(IMG): $(KERNEL) $(GRUB_CFG)
 	@echo 'Creating image (must run as root!)'
 	@sudo ./create_img.sh
 
-$(KERNEL): $(ASM_OBJ) $(LD_SCRIPT)
-	@ld -n -T $(LD_SCRIPT) -o $(KERNEL) $(ASM_OBJ)
+# Link all object files
+$(KERNEL): $(ASM_OBJ) $(C_OBJ) $(LD_SCRIPT)
+	@echo $(C_OBJ)
+	$(LD) $(LDFLAGS) $(ASM_OBJ) $(C_OBJ)
 
 # Compile assembly files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 	@mkdir -p $(shell dirname $@)
 	@nasm -f elf64 $< -o $@
+
+# Compile C files
+build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.c
+	$(CC) $(CFLAGS) $< -o $@
