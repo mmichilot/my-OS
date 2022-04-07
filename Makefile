@@ -9,6 +9,7 @@ LD := $(ARCH)-linux-ld
 
 # Directories
 SRC_DIR := src/arch/$(ARCH)
+INCLUDE_DIR := include/arch/$(ARCH)
 
 # Source files
 LD_SCRIPT := $(SRC_DIR)/linker.ld
@@ -19,7 +20,7 @@ C_SRC := $(wildcard $(SRC_DIR)/*.c)
 C_OBJ := $(patsubst $(SRC_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
 # Tool options
-CFLAGS := -g -c -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra
 LDFLAGS := -n -T $(LD_SCRIPT) -o $(KERNEL)
 QEMU_OPTS := -s -drive format=raw,file=$(IMG) -serial stdio
 
