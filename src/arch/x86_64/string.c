@@ -10,14 +10,16 @@ void *memset(void *s, int c, size_t n)
     return s;
 }
 
-void *memcpy(void *dest, const void *src, size_t n) {
+void *memcpy(void *dest, const void *src, size_t n) 
+{
     size_t i;
     for (i = 0; i < n; i++)
         ((uint8_t*)dest)[i] = ((uint8_t*)src)[i];
 
     return dest;
 }
-size_t strlen(const char *s) {
+size_t strlen(const char *s) 
+{
     size_t len;
 
     for (len = 0; s[len] != '\0'; len++);
@@ -25,7 +27,8 @@ size_t strlen(const char *s) {
     return len;
 }
 
-char *strcpy(char *dest, const char *src) {
+char *strcpy(char *dest, const char *src) 
+{
     size_t i;
 
     for (i = 0; src[i] != '\0'; i++)
@@ -36,7 +39,8 @@ char *strcpy(char *dest, const char *src) {
     return dest;
 }
 
-int my_strcmp(const char *s1, const char *s2) {
+int strcmp(const char *s1, const char *s2) 
+{
     size_t i;
 
     for (i = 0; s1[i] == s2[i]; i++) {
@@ -47,7 +51,8 @@ int my_strcmp(const char *s1, const char *s2) {
     return s1[i] - s2[i];
 }
 
-const char *strchr(const char *s, int c) {
+const char *strchr(const char *s, int c)
+{
     for (; *s != c; s++) {
         if (*s == '\0')
             return NULL;
