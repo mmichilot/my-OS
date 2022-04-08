@@ -21,35 +21,16 @@ C_OBJ := $(patsubst $(SRC_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
 # Tool options
 CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra
+ifeq ($(DEBUG), 1)
+	CFLAGS += -DDEBUG
+endif
+
 LDFLAGS := -n -T $(LD_SCRIPT) -o $(KERNEL)
 QEMU_OPTS := -s -drive format=raw,file=$(IMG) -serial stdio
 
 .PHONY: all clean run img
 
 all: $(KERNEL)
-
-clean:
-	@rm -r build
-
-run: $(IMG)
-	@qemu-system-x86_64 $(QEMU_OPTS)
-
-img: $(IMG)
-
-$(IMG): $(KERNEL) $(GRUB_CFG)
-# Create boot directory and copy files
-	@mkdir -p build/imgfiles/boot/grub
-	@cp $(KERNEL) build/imgfiles/boot/kernel.bin
-	@cp $(GRUB_CFG) build/imgfiles/boot/grub
-
-# Run script to create image (have to run as root!)
-	@echo 'Creating image (must run as root!)'
-	@sudo ./create_img.sh
-
-# Link all object files
-$(KERNEL): $(ASM_OBJ) $(C_OBJ) $(LD_SCRIPT)
-	@echo $(C_OBJ)
-	$(LD) $(LDFLAGS) $(ASM_OBJ) $(C_OBJ)
 
 # Compile assembly files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
@@ -59,3 +40,24 @@ build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 # Compile C files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.c
 	$(CC) $(CFLAGS) $< -o $@
+
+# Link all object files
+$(KERNEL): $(ASM_OBJ) $(C_OBJ) $(LD_SCRIPT)
+	$(LD) $(LDFLAGS) $(ASM_OBJ) $(C_OBJ)
+
+img: $(IMG)
+
+$(IMG): $(KERNEL) $(GRUB_CFG)
+# Create boot directory and copy files
+	@mkdir -p build/imgfiles/boot/grub
+	@cp $(KERNEL) build/imgfiles/boot/kernel.bin
+	@cp $(GRUB_CFG) build/imgfiles/boot/grub
+# Run script to create image (have to run as root!)
+	@echo 'Creating image (must run as root!)'
+	@sudo ./create_img.sh
+
+run: $(IMG)
+	@qemu-system-x86_64 $(QEMU_OPTS)
+
+clean:
+	@rm -r build
