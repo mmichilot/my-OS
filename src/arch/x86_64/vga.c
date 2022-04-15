@@ -1,10 +1,10 @@
-#include <stdint.h>
+#include <stdint-gcc.h>
 #include "string.h"
 #include "vga.h"
 
 #define VGA_BASE 0xb8000
 #define WIDTH 80
-#define HEIGHT 20
+#define HEIGHT 25
 #define LINE(x) (x / WIDTH)
 
 // VGA text buffer entry
@@ -51,7 +51,7 @@ void VGA_clear(void)
     cursor = 0;
 }
 
-void VGA_char(char c) 
+void VGA_char(unsigned char c) 
 {
     if (c == '\n') {
         cursor = (LINE(cursor) + 1) * WIDTH;
@@ -67,12 +67,14 @@ void VGA_char(char c)
         scroll();
 }
 
-void VGA_str(const char *str) 
+int VGA_str(const char *str) 
 {
     int i;
 
     for (i = 0; str[i] != '\0'; i++)
         VGA_char(str[i]);
+
+    return i;
 };
 
 void VGA_fg_color(enum VGA_COLOR fg) {
