@@ -20,7 +20,7 @@ C_SRC := $(wildcard $(SRC_DIR)/*.c)
 C_OBJ := $(patsubst $(SRC_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
 # Tool options
-CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra
+CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra -Werror
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG
 endif
