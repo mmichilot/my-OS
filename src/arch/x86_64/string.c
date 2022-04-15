@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 void *memset(void *s, int c, size_t n)
 {
@@ -53,7 +53,7 @@ int strcmp(const char *s1, const char *s2)
 
 const char *strchr(const char *s, int c)
 {
-    for (; *s != c; s++) {
+    for (; *s != (char) c; s++) {
         if (*s == '\0')
             return NULL;
     }
