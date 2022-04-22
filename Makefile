@@ -9,15 +9,17 @@ LD := $(ARCH)-linux-ld
 
 # Directories
 SRC_DIR := src/arch/$(ARCH)
+BOOT_DIR := $(SRC_DIR)/boot
+KERNEL_DIR := $(SRC_DIR)/kernel
 INCLUDE_DIR := include/arch/$(ARCH)
 
 # Source files
-LD_SCRIPT := $(SRC_DIR)/linker.ld
-GRUB_CFG := $(SRC_DIR)/grub.cfg
-ASM_SRC := $(wildcard $(SRC_DIR)/*.asm)
-ASM_OBJ := $(patsubst $(SRC_DIR)/%.asm, build/arch/$(ARCH)/%.o, $(ASM_SRC))
-C_SRC := $(wildcard $(SRC_DIR)/*.c)
-C_OBJ := $(patsubst $(SRC_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
+LD_SCRIPT := $(BOOT_DIR)/linker.ld
+GRUB_CFG := $(BOOT_DIR)/grub.cfg
+ASM_SRC := $(wildcard $(BOOT_DIR)/*.asm)
+ASM_OBJ := $(patsubst $(BOOT_DIR)/%.asm, build/arch/$(ARCH)/%.o, $(ASM_SRC))
+C_SRC := $(wildcard $(KERNEL_DIR)/*.c)
+C_OBJ := $(patsubst $(KERNEL_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
 # Tool options
 CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra -Werror
@@ -33,12 +35,12 @@ QEMU_OPTS := -s -drive format=raw,file=$(IMG) -serial stdio
 all: $(KERNEL)
 
 # Compile assembly files
-build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
+build/arch/$(ARCH)/%.o: $(BOOT_DIR)/%.asm
 	@mkdir -p $(shell dirname $@)
 	@nasm -f elf64 $< -o $@
 
 # Compile C files
-build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.c
+build/arch/$(ARCH)/%.o: $(KERNEL_DIR)/%.c
 	$(CC) $(CFLAGS) $< -o $@
 
 # Link all object files
