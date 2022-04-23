@@ -22,7 +22,7 @@ C_SRC := $(wildcard $(KERNEL_DIR)/*.c)
 C_OBJ := $(patsubst $(KERNEL_DIR)/%.c, build/arch/$(ARCH)/%.o, $(C_SRC))
 
 # Tool options
-CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra -Werror
+CFLAGS := -g -c -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -Wall -Wextra -Werror -mno-red-zone
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG
 endif
