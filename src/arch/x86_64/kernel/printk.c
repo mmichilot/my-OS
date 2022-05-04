@@ -1,6 +1,6 @@
 #include <stdarg.h>
 #include <stdint-gcc.h>
-#include "vga.h"
+#include "drivers/vga.h"
 
 static inline void num_to_string(char *str, unsigned long long num, int sign, int base);
 

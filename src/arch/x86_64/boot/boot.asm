@@ -159,6 +159,23 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
+
+align 16
 stack_bottom:
-    resb 64
+    resb 4096
 stack_top:
+
+global stack_gp_top
+stack_gp_bottom:
+    resb 4096
+stack_gp_top:
+
+global stack_df_top
+stack_df_bottom:
+    resb 4096
+stack_df_top:
+
+global stack_pf_top
+stack_pf_bottom:
+    resb 4096
+stack_pf_top:

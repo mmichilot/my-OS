@@ -1,9 +1,17 @@
 extern irq_handler
 
+section .rodata
+global isr_stub_table
+isr_stub_table:
+%assign i 0
+%rep 256
+    dq isr_wrapper_%+i
+%assign i i+1
+%endrep
+
 ; No error code
 %macro ISR_WRAPPER 1
-global isr_wrapper_%1
-isr_wrapper_%1:
+isr_wrapper_%+%1:
     push rax
     push rbx
     mov rax, %1            ; save ISR number in RAX
@@ -13,8 +21,7 @@ isr_wrapper_%1:
 
 ; With error code
 %macro ISR_WRAPPER_ERR 1
-global isr_wrapper_%1
-isr_wrapper_%1:
+isr_wrapper_%+%1:
     push rax
     push rbx
     mov rbx, [rsp + 16]     ; save error code
@@ -331,4 +338,3 @@ gen_isr:
     pop rax
 
     iretq
-
