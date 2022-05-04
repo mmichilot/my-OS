@@ -27,6 +27,5 @@ extern void VGA_char(unsigned char c);
 extern int VGA_str(const char *str);
 extern void VGA_fg_color(enum VGA_COLOR fg);
 extern void VGA_bg_color(enum VGA_COLOR bg);
-extern void VGA_blink(void);
 
 #endif

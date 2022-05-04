@@ -1,6 +1,7 @@
 #include <stdint-gcc.h>
 #include "string.h"
-#include "vga.h"
+#include "drivers/vga.h"
+#include "irq.h"
 
 #define VGA_BASE 0xb8000
 #define WIDTH 80
@@ -24,9 +25,8 @@ struct vga_settings
 
 // Local VGA variables
 static struct vga_entry *vga_buf = (struct vga_entry*) VGA_BASE;
-static struct vga_settings vga;
-static int cursor;
-static int blink;
+static struct vga_settings vga = {.bg_color = BLACK, .fg_color = WHITE};
+static int cursor = 0;
 
 // Local functions
 void scroll();
@@ -34,16 +34,7 @@ void scroll();
 /* --- VGA API --- */
 
 void VGA_init(void) {
-    // Initialize settings
-    vga.fg_color = WHITE;
-    vga.bg_color = BLACK;
-    vga.bg_color = 0; // disable blinking
-
-    // Set cursor to zero
-    cursor = 0;
-
-    // Clear screen
-    VGA_clear();
+    memset(vga_buf, 0, WIDTH*HEIGHT*sizeof(uint16_t));
 }
 
 void VGA_clear(void) 
@@ -54,6 +45,12 @@ void VGA_clear(void)
 
 void VGA_char(unsigned char c) 
 {   
+    bool enable_ints = false;
+    if (are_interrupts_enabled()) {
+        enable_ints = true;
+        cli();
+    }
+
     // Do nothing for null character
     if (c == '\0')
         return;
@@ -86,6 +83,9 @@ void VGA_char(unsigned char c)
         scroll();
     else if (cursor < 0)
         cursor = 0;
+
+    if (enable_ints)
+        sti();
 }
 
 int VGA_str(const char *str) 
@@ -108,17 +108,6 @@ void VGA_bg_color(enum VGA_COLOR bg)
     vga.bg_color = bg;
 }
 
-void VGA_blink(void)
-{
-    int i;
-    if(blink)
-        vga_buf[cursor].bg = LIGHT_GRAY;
-    else
-        vga_buf[cursor].bg = vga.bg_color;
-
-    for(i = 0; i < 100000000; i++);
-    blink = !blink;
-}
 /* --- Internal Functions --- */
 void scroll()
 {

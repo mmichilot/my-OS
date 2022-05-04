@@ -56,7 +56,8 @@
 #define LEFT_ALT        0x11
 
 #define PS2_FLUSH() while((inb(PS2_STATUS) & PS2_STATUS_OUTPUT)) { inb(PS2_DATA); }
+#define PS2_KB_IRQ  33
+
 extern void PS2_init(void);
-extern void PS2_keyboard_poll(void);
 
 #endif
