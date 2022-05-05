@@ -1,12 +1,10 @@
 #include <stdint-gcc.h>
 #include <stddef.h>
-#include "drivers/ps2.h"
 #include "port-io.h"
 #include "printk.h"
-#include "scancode.h"
 #include "irq.h"
-
-#define UNUSED(x) (void) x
+#include "drivers/ps2.h"
+#include "drivers/scancode.h"
 
 static const char shifted_key[] = {
     ['`'] = '~', ['1'] = '!', ['2'] = '@', 
