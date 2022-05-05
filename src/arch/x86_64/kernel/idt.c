@@ -5,6 +5,10 @@
 
 extern void* isr_stub_table[];
 
+#define GP 13
+#define PF 14
+#define DF 8
+
 #define INT_GATE    0xE
 #define TRAP_GATE   0xF
 
@@ -48,6 +52,11 @@ void IDT_init(void)
         IDT[i].ist = 0;
         IDT[i].attributes = (INT_GATE | DPL_KERNEL | PRESENT);
     }
+
+    // Configure specific ISTs for #GP, #DF, #PF
+    IDT[GP].ist = GP_IST;
+    IDT[DF].ist = DF_IST;
+    IDT[PF].ist = PF_IST;
 
     lidt((void*)IDT, sizeof(IDT));
 

@@ -8,13 +8,13 @@
 #define KERNEL_CS   1
 #define USER_CS     2
 #define USER_DS     3
-#define TSS         4
+#define TSS_DESC    4
 
 /* GDT Segment Offsets */
 #define KERNEL_CS_OFFSET    8*KERNEL_CS
 #define USER_CS_OFFSET      8*USER_CS
 #define USER_DS_OFFSET      8*USER_DS
-#define TSS_OFFSET          8*TSS
+#define TSS_OFFSET          8*TSS_DESC
 
 /* Segment Descriptor Access */
 #define ACCESSED    (1 << 0)
@@ -36,6 +36,16 @@
 #define LONG_MODE   (1 << 1)
 #define SIZE        (1 << 2)
 #define PAGE_GRAN   (1 << 3)
+
+/* TSS Descriptor Access */
+#define TSS_TYPE(x) (x << 0)
+
+#define TSS_LDT     TSS_TYPE(0x2)
+#define TSS_64      TSS_TYPE(0x9)
+
+#define GP_IST 1
+#define DF_IST 2
+#define PF_IST 3
 
 extern void GDT_init(void);
 

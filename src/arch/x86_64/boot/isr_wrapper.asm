@@ -15,7 +15,7 @@ isr_wrapper_%+%1:
     push rax
     push rbx
     mov rax, %1            ; save ISR number in RAX
-    mov rbx, [rsp + 16]
+    mov rbx, [rsp + 16]    ; save RIP in RBX
     jmp gen_isr
 %endmacro
 

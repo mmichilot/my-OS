@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define NUM_IRQS 256
+#define UNUSED(x) (void) x
 
 typedef void (*irq_handler_t)(int, void*);
 

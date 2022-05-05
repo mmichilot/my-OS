@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint-gcc.h>
 #include "irq.h"
+#include "exception.h"
 #include "idt.h"
 #include "printk.h"
 #include "drivers/i8259.h"
@@ -62,6 +63,7 @@ void IRQ_init(void)
 
     IDT_init();
     PIC_init();
+    setup_handlers();
 
     pr_info("IRQs Initialized\n");
     sti();

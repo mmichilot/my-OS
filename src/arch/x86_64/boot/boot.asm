@@ -143,6 +143,11 @@ enable_paging:
     ret
 
 section .rodata
+global isr_stacks
+isr_stacks:
+    dq stack_gp_top
+    dq stack_df_top
+    dq stack_pf_top
 gdt64:
     dq 0 ; zero entry
 .code: equ $ - gdt64
@@ -165,17 +170,14 @@ stack_bottom:
     resb 4096
 stack_top:
 
-global stack_gp_top
 stack_gp_bottom:
     resb 4096
 stack_gp_top:
 
-global stack_df_top
 stack_df_bottom:
     resb 4096
 stack_df_top:
 
-global stack_pf_top
 stack_pf_bottom:
     resb 4096
 stack_pf_top:
