@@ -1,4 +1,5 @@
 #include <stdint-gcc.h>
+#include <stdbool.h>
 #include "string.h"
 #include "drivers/vga.h"
 #include "irq.h"
@@ -26,15 +27,22 @@ struct vga_settings
 // Local VGA variables
 static struct vga_entry *vga_buf = (struct vga_entry*) VGA_BASE;
 static struct vga_settings vga = {.bg_color = BLACK, .fg_color = WHITE};
+static bool vga_enabled = false;
 static int cursor = 0;
 
 // Local functions
 void scroll();
 
 /* --- VGA API --- */
+bool is_vga_enabled()
+{
+    return vga_enabled;
+}
 
-void VGA_init(void) {
+void VGA_init(void) 
+{
     memset(vga_buf, 0, WIDTH*HEIGHT*sizeof(uint16_t));
+    vga_enabled = true;
 }
 
 void VGA_clear(void) 

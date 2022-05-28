@@ -1,6 +1,8 @@
 #ifndef _VGA_H_
 #define _VGA_H_
 
+#include <stdbool.h>
+
 // VGA color codes
 enum VGA_COLOR {
     BLACK = 0,
@@ -27,5 +29,6 @@ extern void VGA_char(unsigned char c);
 extern int VGA_str(const char *str);
 extern void VGA_fg_color(enum VGA_COLOR fg);
 extern void VGA_bg_color(enum VGA_COLOR bg);
+extern bool is_vga_enabled();
 
 #endif

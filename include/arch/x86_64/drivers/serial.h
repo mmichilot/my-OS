@@ -3,5 +3,6 @@
 
 extern void SER_init(void);
 extern int SER_write(const char *buff, int len);
+extern bool is_serial_enabled();
 
 #endif

@@ -1,6 +1,8 @@
 #include <stdarg.h>
 #include <stdint-gcc.h>
+#include "string.h"
 #include "drivers/vga.h"
+#include "drivers/serial.h"
 
 static inline void num_to_string(char *str, unsigned long long num, int sign, int base);
 
@@ -12,6 +14,26 @@ void print_long(char *str, long num);
 void print_ulong(char *str, unsigned long num, int base);
 void print_long_long(char *str, long long num);
 void print_ulong_long(char *str, unsigned long long num, int base);
+
+int print_str(const char *str) {
+    if (is_serial_enabled())
+        SER_write(str, strlen(str));
+    
+    if (is_vga_enabled())
+        VGA_str(str);
+
+    return strlen(str);
+}
+
+int print_char(char c) {
+    if (is_serial_enabled())
+        SER_write(&c, 1);
+    
+    if (is_vga_enabled())
+        VGA_char(c);
+
+    return 1;
+}
 
 int printk(const char *fmt, ...)
 {
@@ -27,54 +49,54 @@ int printk(const char *fmt, ...)
         // Parse any labels
         if (c == '\001') {
             c = *fmt++;
-            VGA_char('[');
+            num_chars += print_char('[');
             switch(c) {
                 case '1': // Error
                     VGA_fg_color(RED);
-                    num_chars += VGA_str("ERROR");
+                    num_chars += print_str("ERROR");
                     break;
                 case '2': // Info
-                    num_chars += VGA_str("INFO");
+                    num_chars += print_str("INFO");
                     break;
                 default:
                     break;
             }
             VGA_fg_color(WHITE);
-            num_chars += VGA_str("] ") + 1;
+            num_chars += print_str("] ");
         }
         // Parse specifiers
         else if (c == '%') {
             c = *fmt++;
             switch (c) {
                 case '%':
-                    VGA_char('%');
+                    print_char('%');
                     num_chars++;
                     break;
                 case 'c':
-                    VGA_char((unsigned char) va_arg(va, int));
+                    print_char((unsigned char) va_arg(va, int));
                     num_chars++;
                     break;
                 case 's':
-                    num_chars += VGA_str(va_arg(va, const char*));
+                    num_chars += print_str(va_arg(va, const char*));
                     break;
                 case 'p':
-                    num_chars += VGA_str("0x");
+                    num_chars += print_str("0x");
                     print_ulong(buf, va_arg(va, unsigned long), 16);
-                    num_chars += VGA_str(buf);
+                    num_chars += print_str(buf);
                     break;
                 
                 // Integer
                 case 'd':
                     print_int(buf, va_arg(va, int));
-                    num_chars += VGA_str(buf);
+                    num_chars += print_str(buf);
                     break;
                 case 'u':
                     print_uint(buf, va_arg(va, unsigned int), 10);
-                    num_chars += VGA_str(buf);
+                    num_chars += print_str(buf);
                     break;
                 case 'x':
                     print_uint(buf, va_arg(va, unsigned int), 16);
-                    num_chars += VGA_str(buf);
+                    num_chars += print_str(buf);
                     break;
 
                 // Short
@@ -83,18 +105,18 @@ int printk(const char *fmt, ...)
                     switch (c) {
                         case 'd':
                             print_short(buf, (short) va_arg(va, int));
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'u':
                             print_ushort(buf, (unsigned short) va_arg(va, unsigned int), 10);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'x':
                             print_ushort(buf, (unsigned short) va_arg(va, unsigned int), 16);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         default:
-                            VGA_char(c);
+                            print_char(c);
                             num_chars++;
                             break;
                     }
@@ -106,19 +128,18 @@ int printk(const char *fmt, ...)
                     switch (c) {
                         case 'd':
                             print_long(buf, va_arg(va, long));
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'u':
                             print_ulong(buf, va_arg(va, unsigned long), 10);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'x':
                             print_ulong(buf, va_arg(va, unsigned long), 16);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         default:
-                            VGA_char(c);
-                            num_chars++;
+                            num_chars += print_char(c);
                             break;
                     }
                     break;
@@ -129,34 +150,31 @@ int printk(const char *fmt, ...)
                     switch (c) {
                         case 'd':
                             print_long_long(buf, va_arg(va, long long));
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'u':
                             print_ulong_long(buf, va_arg(va, unsigned long long), 10);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         case 'x':
                             print_ulong_long(buf, va_arg(va, unsigned long long), 16);
-                            num_chars += VGA_str(buf);
+                            num_chars += print_str(buf);
                             break;
                         default:
-                            VGA_char(c);
-                            num_chars++;
+                            num_chars += print_char(c);
                             break;
                     }
                     break;
 
 
                 default:
-                    VGA_char(c);
-                    num_chars++;
+                    num_chars += print_char(c);
                     break;
             }
         }
         // Print character
         else {
-            VGA_char(c);
-            num_chars++;
+            num_chars += print_char(c);
         }
     }
 

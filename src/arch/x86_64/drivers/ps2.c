@@ -54,7 +54,6 @@ static inline void PS2_keyboard_cmd(uint8_t cmd) {
 
 /* PS/2 Keyboard Interrupt Handler */
 static void PS2_keyboard_int(int error, void* arg) {
-    cli();
     UNUSED(error);
     UNUSED(arg);
     uint8_t scancode;
@@ -99,7 +98,6 @@ static void PS2_keyboard_int(int error, void* arg) {
         key = shifted_key[(int) key];
 
     printk("%c", key);
-    sti();
 }
 
 /* Initialization Functions */
