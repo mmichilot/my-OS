@@ -3,8 +3,14 @@ extern long_mode_start
 
 section .text
 bits 32
+
+global multiboot_tags
+multiboot_tags:
+    dq 0
+
 start:
     mov esp, stack_top
+    mov [multiboot_tags], ebx
 
     call check_multiboot
     call check_cpuid
@@ -143,6 +149,7 @@ enable_paging:
     ret
 
 section .rodata
+
 global isr_stacks
 isr_stacks:
     dq stack_gp_top
@@ -157,6 +164,7 @@ gdt64:
     dq gdt64
 
 section .bss
+
 align 4096
 p4_table:
     resb 4096
