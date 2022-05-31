@@ -14,7 +14,7 @@ struct TSS_entry {
     uint8_t  base3;     // TSS address 3
     uint32_t base4;     // TSS address 4
     uint32_t :32;       // Reserved
-};
+} __attribute__((packed));
 
 static struct {
     uint32_t :32;       // Segment Limit 1 and Base Address 1 (ignored in long mode)
