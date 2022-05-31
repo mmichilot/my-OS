@@ -34,7 +34,6 @@ bool is_serial_enabled()
 
 void start_tx(struct State *state) 
 {
-
     // Check if buffer is empty
     if (state->consumer == state->producer) {
         return;
@@ -125,7 +124,7 @@ struct State* init_state(void)
     static struct State state;
 
     state.consumer = &state.buff[0];
-    state.producer = &state.buff[1];
+    state.producer = &state.buff[0];
 
     return &state;
 }
