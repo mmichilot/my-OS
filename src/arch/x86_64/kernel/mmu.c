@@ -50,7 +50,7 @@ void parse_mmap(void)
         }
     }
 
-    pr_info("Total # of Page Frames: %d\n", num_pages);
+    pr_info("Total # of Page Frames: %d\n", num_pages - reserved.num_reserved);
 }
 
 void parse_elf(void)
@@ -154,11 +154,6 @@ void MMU_pf_free(void *pf)
     pf_pool.num_free++;
 }
 
-int MMU_num_reserved(void)
-{
-    return reserved.num_reserved;
-}
-
 void MMU_init(void) 
 {
     pr_info("Initializing Memory Management\n");
@@ -175,9 +170,74 @@ void MMU_init(void)
     *reserved.end++ = 0x0;
     reserved.num_reserved = 1;
 
-    parse_mmap();
     parse_elf();
+    parse_mmap();
+    
     add_to_pool();
 
     pr_info("Memory Management Initialized\n");
+}
+
+void test_MMU(void)
+{
+    pr_info("Starting MMU Test\n");
+    void *addr[100];
+
+    printk("\nGetting Page Frames\n");
+    for (int i = 0; i < 100; i++) {
+        if ((addr[i] = MMU_pf_alloc()) == NULL) {
+            pr_err("No more page frames!\n");
+            return;
+        }
+        printk("Page address: %p\n", addr[i]);
+    }
+
+    printk("\nFreeing Page Frames\n");
+    for (int i = 99; i >= 0; i--) {
+        printk("Page address: %p\n", addr[i]);
+        MMU_pf_free(addr[i]);
+    }
+
+    printk("\nGetting Page Frames\n");
+    for (int i = 0; i < 100; i++) {
+        if ((addr[i] = MMU_pf_alloc()) == NULL) {
+            pr_err("No more page frames!\n");
+            return;
+        }
+        printk("Page address: %p\n", addr[i]);
+    }
+
+    printk("\nFreeing Page Frames\n");
+    for (int i = 99; i >= 0; i--) {
+        printk("Page address: %p\n", addr[i]);
+        MMU_pf_free(addr[i]);
+    }
+
+    pr_info("MMU Test Completed\n");
+}
+
+void stress_MMU(void)
+{
+    pr_info("Stress Testing MMU\n");
+    
+    int num_pages = 0;
+    intptr_t *pf;  
+    while ((pf = (intptr_t*) MMU_pf_alloc()) != NULL) {
+
+        for (size_t j = 0; j < PAGE_SIZE/sizeof(intptr_t); j++)
+            pf[j] = (intptr_t) pf; 
+
+        for (size_t j = 0; j < PAGE_SIZE/sizeof(intptr_t); j++) {
+            if (pf[j] != (intptr_t) pf) {
+                pr_err("[Page %p] Bit pattern on invalid\n", pf);
+                return;
+            }
+        }
+
+        num_pages++;
+    }
+
+    pr_info("Total # of Page Frames Allocated: %d\n", num_pages);
+    pr_info("No Error Detected!\n");
+    pr_info("Stress Testing Complete\n");
 }
