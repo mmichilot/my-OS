@@ -3,6 +3,7 @@
 #include "gdt.h"
 #include "irq.h"
 #include "mmu.h"
+#include "page_table.h"
 #include "printk.h"
 #include "drivers/vga.h"
 #include "drivers/ps2.h"
@@ -18,9 +19,7 @@ void kmain(void *tags)
     parse_tags(tags);
     MMU_init();
     PS2_init();
-
-    test_MMU();
-    stress_MMU();
+    PT_init();
     
     // Halt indefinitely
     while (1) {
