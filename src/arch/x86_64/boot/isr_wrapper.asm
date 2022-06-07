@@ -29,7 +29,7 @@ isr_wrapper_%+%1:
     mov [rsp + 16], rax
     mov rax, [rsp]          ; move RBX up the stack
     mov [rsp + 8], rax
-    sub rsp, 8
+    add rsp, 8
     mov rax, %1            ; save ISR number in RAX
     jmp gen_isr
 %endmacro
