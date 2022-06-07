@@ -38,11 +38,29 @@ void add_blocks(struct kmalloc_pool *pool)
         addr = addr->next;
     }
 
-    printk("Page Contents\n");
-    for (int i = 0; i < 512; i++) {
-        printk("[%d] 0x%lx\n", i, *(((uint64_t*)pool->head) + i));
-    }
+    pool->avail += PAGE_SIZE/pool->max_size;
+}
 
+void *kmalloc(size_t size)
+{
+    // Iterate though each pool to detemine which one can
+    // accomodate allocation
+    for (int i = 0; i < NUM_POOLS; i++) {
+        if (pools[i].max_size >= (size + sizeof(struct kmalloc_extra))) {
+            struct kmalloc_pool *pool = &pools[i];
+            struct kmalloc_extra *block = (struct kmalloc_extra*) pool->head;
+
+            // Add more blocks if necessary
+            if (pool->avail == 0)
+                add_blocks(pool);
+            
+            pool->head = pool->head->next;
+            block->pool = pool;
+            block->size = size;
+
+            return (void*) ((char*) block + sizeof(struct kmalloc_extra));
+        }
+    }
 }
 
 void kmalloc_init(void) {
@@ -51,8 +69,7 @@ void kmalloc_init(void) {
     // Setup pools
     for (int i = 0; i < NUM_POOLS; i++) {
         pools[i].max_size = BASE_SIZE << i;
-        printk("Setting up %d B pool\n", pools[i].max_size);
-        pools[i].avail = PAGE_SIZE/pools[i].max_size;
+        pools[i].avail = 0;
         add_blocks(&pools[i]);
     }
 }
