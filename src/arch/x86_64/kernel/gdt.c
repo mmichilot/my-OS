@@ -66,14 +66,14 @@ void GDT_init(void)
     GDT[USER_DS].access = (TYPE_DS | PRESENT);
     
     // Configure TSS
-    TSS.ist[GP_IST] = (uint64_t) isr_stacks[GP_IST];
-    TSS.ist[DF_IST] = (uint64_t) isr_stacks[DF_IST];
-    TSS.ist[PF_IST] = (uint64_t) isr_stacks[PF_IST];
+    TSS.ist[GP_IST] = (intptr_t) isr_stacks[GP_IST];
+    TSS.ist[DF_IST] = (intptr_t) isr_stacks[DF_IST];
+    TSS.ist[PF_IST] = (intptr_t) isr_stacks[PF_IST];
     TSS.iopb = (uint16_t) sizeof(TSS);
 
     // Add TSS descriptor to GDT
     struct TSS_entry* TSS_seg = (struct TSS_entry*) &GDT[TSS_DESC]; 
-    uint64_t TSS_addr = (uint64_t) &TSS;
+    intptr_t TSS_addr = (intptr_t) &TSS;
     uint32_t TSS_size = (uint32_t) sizeof(TSS);
     TSS_seg->base1 = TSS_addr & 0xFFFF;
     TSS_seg->base2 = (TSS_addr >> 16) & 0xFF;
