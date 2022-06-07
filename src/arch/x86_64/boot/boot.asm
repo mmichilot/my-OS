@@ -152,6 +152,7 @@ section .rodata
 
 global isr_stacks
 isr_stacks:
+    dq 0 ; zero entry
     dq stack_gp_top
     dq stack_df_top
     dq stack_pf_top
@@ -173,7 +174,6 @@ p3_table:
 p2_table:
     resb 4096
 
-align 16
 stack_bottom:
     resb 4096
 stack_top:
