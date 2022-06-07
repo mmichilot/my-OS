@@ -28,8 +28,7 @@ static struct {
 static struct {
     uint32_t :32;       // Reserved
     uint64_t rsp[3];    // Stack Pointers
-    uint64_t :64;       // Reserved
-    uint64_t ist[7];    // Interrupt Stack Table
+    uint64_t ist[8];    // Interrupt Stack Table
     uint64_t :64;       // Reserved
     uint16_t :16;       // Reserved
     uint16_t iopb;      // IO Map Base Address
