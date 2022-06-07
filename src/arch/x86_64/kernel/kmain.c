@@ -26,7 +26,7 @@ void test_virtual_page_alloc(int num_pages) {
             pr_err("Error w/ bitpattern");
         }
     }
-    printk("All pages read successfully!");
+    printk("All pages read successfully!\n");
     
     printk("Freeing pages\n");
     MMU_free_pages((void*) page, num_pages);
