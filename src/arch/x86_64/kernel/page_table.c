@@ -176,12 +176,15 @@ void page_fault_handler(int error, void* arg)
     // Check demand bit and error code
     struct entry *pte = (struct entry*) get_pte((void*) pml4_table, (void*) (virt_addr & ~0xFFF));
     if ((pte->base & DEMAND) && !(error & ERR_PRESENT)) {
-        pr_info("Allocating page: 0x%lx\n", (virt_addr & ~0xFFF));
         // Set demand bit to 0
         pte->base &= ~DEMAND;
         
         // Allocate page
-        pte->base = (intptr_t) MMU_pf_alloc();
+        void *addr = NULL;
+        if ((addr = MMU_pf_alloc()) == NULL)
+            asm volatile ("hlt");
+
+        pte->base = (intptr_t) addr;
         pte->base |= (PRESENT | WRITEABLE);
 
         return;
