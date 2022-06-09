@@ -5,6 +5,6 @@
 
 extern void kmalloc_init(void);
 extern void *kmalloc(size_t size);
-extern void free(void *addr);
+extern void kfree(void *addr);
 
 #endif
